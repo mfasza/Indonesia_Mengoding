@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Vue</title>
+</head>
+<body>
+
+    <div id="app">
+        <ol style="list-style: none;">
+            <li v-for="(k, index) in daftar_komentar">
+                <div style="margin-bottom: 25px;">
+                    <button v-on:click="getLike(index)">&plus;</button>
+                    <p style="margin-top: 5px;margin-bottom: 5px;">
+                        {{ k.komen }} || {{ k.tanggal }} || Score : {{ k.score }}
+                    </p>
+                    <button v-on:click="getDislike(index)">&minus;</button>
+                </div>
+            </li>
+        </ol>
+        <hr>
+        <textarea name="komen" id="komen" cols="100" rows="5" placeholder="Masukkan komentar" v-on:keyup.enter="simpan"></textarea>
+    </div>
+
+
+    <script src="../node_modules/vue/dist/vue.min.js"></script>
+    <script>
+        let komentar = new Vue({
+            el: '#app',
+            data : {
+                daftar_komentar : [
+                    {
+                        komen: "Bagus sekali",
+                        tanggal: "26-02-2021",
+                        score: 1,
+                        likes: [
+                            {
+                                user_id: 1,
+                                like: 1
+                            }
+                        ]
+                    },
+                    {
+                        komen: "Lumayan lah",
+                        tanggal: "26-02-2021" ,
+                        score: 5,
+                        likes: [
+                            {
+                                user_id: 1,
+                                like: 1
+                            },
+                            {
+                                user_id: 2,
+                                like: 1
+                            },
+                            {
+                                user_id: 3,
+                                like: 1
+                            },
+                            {
+                                user_id: 4,
+                                like: 1
+                            },
+                            {
+                                user_id: 5,
+                                like: 1
+                            }
+                        ]
+                    },
+                    {
+                        komen: "Sungguh luar biasa",
+                        tanggal: "23-02-2021" ,
+                        score: 1,
+                        likes: [
+                            {
+                                user_id: 1,
+                                like: 1
+                            },
+                            {
+                                user_id: 2,
+                                like: 1
+                            },
+                            {
+                                user_id: 3,
+                                like: -1
+                            },
+                        ]
+                    }
+                ],
+                user_id : 5
+            },
+            methods: {
+                nowDate: function () {
+                    let today = new Date();
+                    let year = today.getFullYear();
+                    let month = ((today.getMonth()+1) < 10) ? '0'+(today.getMonth()+1) : (today.getMonth()+1)
+                    let date = (today.getDate() < 10) ? '0'+today.getDate() : today.getDate();
+                    return date+'-'+month+'-'+year;
+                },
+                simpan: function () {
+                    let textarea = document.getElementById('komen');
+                    let komentar = {
+                        komen: textarea.value,
+                        tanggal: this.nowDate(),
+                        score: 0,
+                        likes: []
+                    };
+                    textarea.value = "";
+                    this.daftar_komentar.push(komentar);
+                },
+                scoreCount: function (arr) {
+                    let tot_likes = 0;
+                    arr.forEach(item => {
+                        tot_likes += item.like;
+                    });
+                    return tot_likes;
+                },
+                getLike: function (idx) {
+                    let data = this.daftar_komentar[idx];
+                    let user_id = this.user_id;
+                    let user_like = data.likes.find(item => item.user_id == user_id);
+                    if (!user_like) {
+                        data.likes.push({
+                            user_id: user_id,
+                            like: 1
+                        })
+                        data.score = this.scoreCount(data.likes);
+                    } else {
+                        idx_user_like = data.likes.indexOf(user_like);
+                        if (user_like.like == 1) {
+                            data.likes.splice(idx_user_like,1);
+                            data.score = this.scoreCount(data.likes);
+                        } else if (user_like.like == -1) {
+                            user_like.like = 1;
+                            data.likes.splice(idx_user_like,1, user_like);
+                            data.score = this.scoreCount(data.likes);
+                        }
+                    }
+                },
+                getDislike: function (idx) {
+                    let data = this.daftar_komentar[idx];
+                    let user_id = this.user_id;
+                    let user_like = data.likes.find(item => item.user_id == user_id);
+                    if (!user_like) {
+                        data.likes.push({
+                            user_id: user_id,
+                            like: -1
+                        })
+                        data.score = this.scoreCount(data.likes);
+                    } else {
+                        idx_user_like = data.likes.indexOf(user_like);
+                        if (user_like.like == 1) {
+                            user_like.like = -1;
+                            data.likes.splice(idx_user_like,1, user_like);
+                            data.score = this.scoreCount(data.likes);
+                        } else if (user_like.like == -1) {
+                            data.likes.splice(idx_user_like,1);
+                            data.score = this.scoreCount(data.likes);
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

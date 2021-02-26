@@ -1,0 +1,35 @@
+likes {
+    like_id (PK),
+    komen_id,
+    user_id,
+    like
+}
+
+user {
+    user_id (PK)
+}
+
+komentar {
+    komen_id (PK),
+    user_id
+}
+
+
+__________ Ambil Komentar beserta likesnya __________
+
+komentar {
+    komen_id,
+    user_id,
+    likes: [
+        {
+            like_id,
+            user_id,
+            like
+        }
+        {
+            like_id,
+            user_id,
+            like
+        }
+    ]
+}
